@@ -7,8 +7,10 @@ public class Tower : MonoBehaviour
     public GameObject _upgrade = null;
     private GameObject upgrade { get { return _upgrade; } }
 
-    private float fireRate { get; set;} = 0.1f;
+    private float fireRate { get; set;} = 0.5f;
     private float currentFireRate { get; set; } = 0.0f;
+
+    private bool canShoot { get; set; } = true;
 
     private List<Enemy> enemies { get; set; } = null;
 
@@ -19,7 +21,23 @@ public class Tower : MonoBehaviour
 
     private void Update()
     {
-        
+        if(!canShoot)
+        {
+            currentFireRate += Time.deltaTime;
+            if(currentFireRate >= fireRate)
+            {
+                currentFireRate = 0;
+                canShoot = true;
+            }
+            return;
+        }
+
+        if(enemies != null && enemies.Count > 0)
+        {
+            Destroy(enemies[0].gameObject);
+            enemies.RemoveAt(0);
+            canShoot = false;
+        }
     }
 
     public void Upgrade()
@@ -32,20 +50,13 @@ public class Tower : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void AddEnemy(Enemy enemy)
     {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if(enemy != null)
-        {
-            enemies.Add(enemy);
-        }
+        enemies.Add(enemy);
     }
-    private void OnTriggerExit(Collider other)
+
+    public void RemoveEnemy(Enemy enemy)
     {
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            enemies.Remove(enemy);
-        }
+        enemies.Remove(enemy);
     }
 }
